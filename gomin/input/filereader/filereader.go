@@ -29,12 +29,14 @@ func ContentOf(file string) (*Gofile, error) {
 
 func readFrom(file *os.File) *Gofile {
 	buf := Gofile{make([]string, 0)}
-	reader := bufio.NewReader(file)
-	var row []byte
-	var err error
-	for err == nil {
-		row, _, err = reader.ReadLine()
-		buf.Rows = append(buf.Rows, string(row))
+	scanner := bufio.NewScanner(file)
+	endOfScan := false
+	for !endOfScan {
+		endOfScan = !scanner.Scan()
+		if scanner.Err() == nil {
+			row := scanner.Text()
+			buf.Rows = append(buf.Rows, row)	
+		}
 	}
 	return &buf
 }
