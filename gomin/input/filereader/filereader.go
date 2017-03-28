@@ -5,19 +5,11 @@ import(
 	"bufio"
 )
 
-type Gofile struct {
-	Rows []string
+type Filereader struct {
+	
 }
 
-func (gf *Gofile) String() string {
-	s := ""
-	for _, r := range gf.Rows {
-		s = s + r + "\n"
-	}
-	return s
-}
-
-func ContentOf(file string) (*Gofile, error) {
+func (r *Filereader) ContentOf(file string) (*Gofile, error) {
 	f, err := os.Open(file)
 	if err != nil {
 		return nil, err

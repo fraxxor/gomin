@@ -6,8 +6,9 @@ import (
 )
 
 func TestContentOf_Success(t *testing.T) {
+	reader := new(Filereader)
 	testfile := "D:/Programmierung/Go/rsrc/testfile.txt"
-	content, err := ContentOf(testfile)
+	content, err := reader.ContentOf(testfile)
 	if err != nil {
 		t.Errorf("Expected no error, but was %v", err)
 	}
@@ -15,8 +16,9 @@ func TestContentOf_Success(t *testing.T) {
 }
 
 func TestContentOf_HalloDatei(t *testing.T) {
+	reader := new(Filereader)
 	testfile := "D:/Programmierung/Go/rsrc/testfile.txt"
-	content, err := ContentOf(testfile)
+	content, err := reader.ContentOf(testfile)
 	if err != nil {
 		t.Errorf("Expected no error, but was %v", err)
 	}
