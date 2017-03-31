@@ -1,4 +1,4 @@
-package filereader
+package gofilereader
 
 type Gofile struct {
 	Rows []string

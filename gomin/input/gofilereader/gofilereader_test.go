@@ -1,4 +1,4 @@
-package filereader
+package gofilereader
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 )
 
 func TestContentOf_Success(t *testing.T) {
-	reader := new(Filereader)
+	reader := new(GofilereaderFS)
 	testfile := "D:/Programmierung/Go/rsrc/testfile.txt"
 	content, err := reader.ContentOf(testfile)
 	if err != nil {
@@ -16,7 +16,7 @@ func TestContentOf_Success(t *testing.T) {
 }
 
 func TestContentOf_HalloDatei(t *testing.T) {
-	reader := new(Filereader)
+	reader := new(GofilereaderFS)
 	testfile := "D:/Programmierung/Go/rsrc/testfile.txt"
 	content, err := reader.ContentOf(testfile)
 	if err != nil {

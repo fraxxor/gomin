@@ -1,15 +1,15 @@
-package filereader
+package gofilereader
 
 import(
 	"os"
 	"bufio"
 )
 
-type Filereader struct {
+type GofilereaderFS struct {
 	
 }
 
-func (r *Filereader) ContentOf(file string) (*Gofile, error) {
+func (r *GofilereaderFS) ContentOf(file string) (*Gofile, error) {
 	f, err := os.Open(file)
 	if err != nil {
 		return nil, err
