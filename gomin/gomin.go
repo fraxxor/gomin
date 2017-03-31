@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"de.fraxxor.gofrax/gomin/input/gofilereader"
+	"de.fraxxor.gofrax/gomin/input/godirectoryreader"
 )
 
 func main() {
@@ -13,6 +14,8 @@ func main() {
 	if err != nil {
 		fmt.Printf("Error on Read: %v", err)
 	} else {
-		fmt.Printf("Successfully read the following:\n%s", content)
+		fmt.Printf("Successfully read the following:\n%s\n", content)
 	}
+	goDir := godirectoryreader.Godirectory{[]string{"FileA", "FileB"}, []string{"DirX"}}
+	fmt.Printf("Directory = \n%s\n", &goDir)
 }
