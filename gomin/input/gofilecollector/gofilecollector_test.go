@@ -8,7 +8,7 @@ import(
 
 func TestCollectRecursive_OnlyFiles(t *testing.T) {
 	var dirReaderStub godirectoryreader.Godirectoryreader
-	dirReaderStub = &DirReaderStub{makeDirWith([]string{"Testfile.txt", "Andere Datei.csv"}, []string{})}
+	dirReaderStub = MakeDirReader(makeDirWith([]string{"Testfile.txt", "Andere Datei.csv"}, []string{}))
 	var fileReaderStub gofilereader.Gofilereader
 	fileReaderStub = &FileReaderStub{gofilereader.Gofile{[]string{"Testzeile"}}}
 	collector := MakeGofilecollector(&dirReaderStub, &fileReaderStub)
@@ -20,7 +20,7 @@ func TestCollectRecursive_OnlyFiles(t *testing.T) {
 
 func TestCollectRecursive_OneSubDir(t *testing.T) {
 	var dirReaderStub godirectoryreader.Godirectoryreader
-	dirReaderStub = &DirReaderStub{makeDirWith([]string{"Testfile.txt", "Andere Datei.csv"}, []string{"Subdir"})}
+	dirReaderStub = MakeDirReader(makeDirWith([]string{"Testfile.txt", "Andere Datei.csv"}, []string{"Subdir"}))
 	var fileReaderStub gofilereader.Gofilereader
 	fileReaderStub = &FileReaderStub{gofilereader.Gofile{[]string{"Testzeile"}}}
 	collector := MakeGofilecollector(&dirReaderStub, &fileReaderStub)
@@ -38,11 +38,23 @@ func makeDirWith(files []string, dirs []string) godirectoryreader.Godirectory {
 }
 
 type DirReaderStub struct {
+	amountOfDirReturns int
+	amountOfMaxDirReturns int
 	dir godirectoryreader.Godirectory
 }
 
+func MakeDirReader(dir godirectoryreader.Godirectory) *DirReaderStub {
+	return &DirReaderStub{0, 1, dir}
+}
+
 func (s *DirReaderStub) ReadDirectory(pathToDir string) (*godirectoryreader.Godirectory, error) {
-	return &s.dir, nil
+	if s.amountOfDirReturns < s.amountOfMaxDirReturns {
+		s.amountOfDirReturns = s.amountOfDirReturns + 1
+		return &s.dir, nil
+	} else {
+		dirWithoutSubdirs := makeDirWith(s.dir.Filepaths, []string{})
+		return &dirWithoutSubdirs, nil
+	}
 }
 
 type FileReaderStub struct {
