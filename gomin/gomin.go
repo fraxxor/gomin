@@ -21,6 +21,6 @@ func main() {
 	if err != nil {
 		fmt.Printf("Error on DirRead: %v", err)
 	} else {
-		fmt.Printf("Directory = \n%s\n", godir)	
+		fmt.Printf("Directory = \n%s\n", godir)
 	}
 }
