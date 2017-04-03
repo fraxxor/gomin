@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"de.fraxxor.gofrax/gomin/input/gofilereader"
 	"de.fraxxor.gofrax/gomin/input/godirectoryreader"
+	"de.fraxxor.gofrax/gomin/input/gofilecollector"
 )
 
 func main() {
@@ -22,5 +23,12 @@ func main() {
 		fmt.Printf("Error on DirRead: %v", err)
 	} else {
 		fmt.Printf("Directory = \n%s\n", godir)
+	}
+	var dirReaderAbstr godirectoryreader.Godirectoryreader
+	dirReaderAbstr = dirReader
+	dirCollector := gofilecollector.MakeGofilecollector(&dirReaderAbstr, &reader)
+	gofilesRecursive := dirCollector.CollectRecursive("D:/Programmierung/Go/rsrc")
+	for _, gf := range gofilesRecursive {
+		fmt.Printf("+++GoFile:\n%s\n---\n", &gf)
 	}
 }
