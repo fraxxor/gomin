@@ -27,7 +27,7 @@ func main() {
 	var dirReaderAbstr godirectoryreader.Godirectoryreader
 	dirReaderAbstr = dirReader
 	dirCollector := gofilecollector.MakeGofilecollector(&dirReaderAbstr, &reader)
-	gofilesRecursive := dirCollector.CollectRecursive("D:/Programmierung/Go/rsrc")
+	gofilesRecursive := dirCollector.CollectRecursive("D:/Programmierung/Go/src/de.fraxxor.gofrax/gomin")
 	for _, gf := range gofilesRecursive {
 		fmt.Printf("+++\n%s\n---\n", &gf)
 	}
