@@ -12,5 +12,5 @@ type Pfile struct {
 }
 
 type PfileProcessor interface {
-	ProcessGofile(gofile *gofilereader.Gofile) *Pfile
+	ProcessGofile(gofile *gofilereader.Gofile) (*Pfile, error)
 }
