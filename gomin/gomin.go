@@ -29,6 +29,6 @@ func main() {
 	dirCollector := gofilecollector.MakeGofilecollector(&dirReaderAbstr, &reader)
 	gofilesRecursive := dirCollector.CollectRecursive("D:/Programmierung/Go/rsrc")
 	for _, gf := range gofilesRecursive {
-		fmt.Printf("+++GoFile:\n%s\n---\n", &gf)
+		fmt.Printf("+++\n%s\n---\n", &gf)
 	}
 }

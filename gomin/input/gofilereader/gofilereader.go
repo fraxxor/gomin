@@ -15,12 +15,13 @@ func (r *GofilereaderFS) ContentOf(file string) (*Gofile, error) {
 		return nil, err
 	}
 	content := readFrom(f)
+	(*content).AbsolutePath = file
 	f.Close()
 	return content, nil
 }
 
 func readFrom(file *os.File) *Gofile {
-	buf := Gofile{make([]string, 0)}
+	buf := Gofile{Rows: make([]string, 0)}
 	scanner := bufio.NewScanner(file)
 	endOfScan := false
 	for !endOfScan {

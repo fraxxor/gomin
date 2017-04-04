@@ -10,7 +10,7 @@ func TestCollectRecursive_OnlyFiles(t *testing.T) {
 	var dirReaderStub godirectoryreader.Godirectoryreader
 	dirReaderStub = MakeDirReader(makeDirWith([]string{"Testfile.txt", "Andere Datei.csv"}, []string{}))
 	var fileReaderStub gofilereader.Gofilereader
-	fileReaderStub = &FileReaderStub{gofilereader.Gofile{[]string{"Testzeile"}}}
+	fileReaderStub = &FileReaderStub{gofilereader.Gofile{"", []string{"Testzeile"}}}
 	collector := MakeGofilecollector(&dirReaderStub, &fileReaderStub)
 	gofiles := collector.CollectRecursive("")
 	if len(gofiles) != 2 {
@@ -22,7 +22,7 @@ func TestCollectRecursive_OneSubDir(t *testing.T) {
 	var dirReaderStub godirectoryreader.Godirectoryreader
 	dirReaderStub = MakeDirReader(makeDirWith([]string{"Testfile.txt", "Andere Datei.csv"}, []string{"Subdir"}))
 	var fileReaderStub gofilereader.Gofilereader
-	fileReaderStub = &FileReaderStub{gofilereader.Gofile{[]string{"Testzeile"}}}
+	fileReaderStub = &FileReaderStub{gofilereader.Gofile{"", []string{"Testzeile"}}}
 	collector := MakeGofilecollector(&dirReaderStub, &fileReaderStub)
 	gofiles := collector.CollectRecursive("")
 	if len(gofiles) != 4 {

@@ -1,11 +1,12 @@
 package gofilereader
 
 type Gofile struct {
+	AbsolutePath string
 	Rows []string
 }
 
 func (gf *Gofile) String() string {
-	s := ""
+	s := "Gofile <" + gf.AbsolutePath + ">\n"
 	for _, r := range gf.Rows {
 		s = s + r + "\n"
 	}
