@@ -7,22 +7,33 @@ import (
 
 func TestCleanFromImports_Identical(t *testing.T) {
 	rows := []string{"first row", "second row"}
-	sourcefile := pfile.Pfile{"", rows, "", ""}
+	file := pfile.Pfile{"", rows, "", ""}
 	cleaner := PcleanerImpl{}
-	cleanedfile := cleaner.CleanFromImports(&sourcefile)
-	if !areRowsEqual((*cleanedfile).Rows, rows) {
-		t.Errorf("Expected <%s> but was <%s>.\n", rows, (*cleanedfile).Rows)
+	cleaner.CleanFromImports(&file)
+	if !areRowsEqual(file.Rows, rows) {
+		t.Errorf("Expected <%s> but was <%s>.\n", rows, file.Rows)
 	}
 }
 
 func TestCleanFromImports_Replaced(t *testing.T) {
 	rows := []string{"import \"test\"", "test.doSmth"}
 	expRows := []string{"doSmth"}
-	sourcefile := pfile.Pfile{"", rows, "", ""}
+	file := pfile.Pfile{"", rows, "", ""}
 	cleaner := PcleanerImpl{}
-	cleanedfile := cleaner.CleanFromImports(&sourcefile)
-	if !areRowsEqual((*cleanedfile).Rows, expRows) {
-		t.Errorf("Expected <%s> but was <%s>.\n", expRows, (*cleanedfile).Rows)
+	cleaner.CleanFromImports(&file)
+	if !areRowsEqual(file.Rows, expRows) {
+		t.Errorf("Expected <%s> but was <%s>.\n", expRows, file.Rows)
+	}
+}
+
+func TestCleanFromImports_Multiimport(t *testing.T) {
+	rows := []string{"import (", "  \"test\"", "  \"test2\"", ")", "test.doSmth", "test2.doAnth"}
+	expRows := []string{"doSmth", "doAnth"}
+	file := pfile.Pfile{"", rows, "", ""}
+	cleaner := PcleanerImpl{}
+	cleaner.CleanFromImports(&file)
+	if !areRowsEqual(file.Rows, expRows) {
+		t.Errorf("Expected <%s> but was <%s>.\n", expRows, file.Rows)
 	}
 }
 
