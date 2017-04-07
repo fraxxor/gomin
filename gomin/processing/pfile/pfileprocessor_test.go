@@ -3,6 +3,7 @@ package pfile
 import (
 	"de.fraxxor.gofrax/gomin/input/gofilereader"
 	"testing"
+	"strings"
 )
 
 func TestProcessGofile_NoPackage(t *testing.T) {
@@ -59,9 +60,11 @@ func TestProcessGofile_Import(t *testing.T) {
 		t.Errorf("Expected one import, but was %d.\n", len((*pfile).Imports))
 		return
 	}
-	importFrax := Goimport{"", "frax"}
-	if (*pfile).Imports[0] == importFrax{
-		t.Errorf("Expected <%s> but was <%s>.\n", importFrax, (*pfile).Imports[0])
+	if !strings.EqualFold((*pfile).Imports[0].ImportPath(), "frax") {
+		t.Errorf("Expected <%s> but was <%s>.\n", "frax", ((*pfile).Imports[0]).ImportPath())
+	}
+	if !strings.EqualFold((*pfile).Imports[0].Prefix(), "frax") {
+		t.Errorf("Expected <%s> but was <%s>.\n", "frax", ((*pfile).Imports[0]).Prefix())
 	}
 	expectedRows := []string{"frax.doSmth()"}
 	if !areRowsEqual(expectedRows, (*pfile).Rows) {

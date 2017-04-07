@@ -31,9 +31,20 @@ func (processor *ProcessGofileImpl) ProcessGofile(gofile *gofilereader.Gofile) (
 	if err != nil {
 		return nil, err
 	}
+	processImportInformation(&pfile)
 	return &pfile, nil
 }
 
+func deleteIndexOfSlice(slice *[]string, index int) *[]string {
+	sliceWithDelete := append((*slice)[:index], (*slice)[index + 1:]...)
+	return &sliceWithDelete
+}
+
+/**
+ * Determines the package and package path.
+ * Removes every package declaration row.
+ * Returns an error iff package and package path do not fit
+ */
 func processPackageInformation(gofile *gofilereader.Gofile, pfile *Pfile) error {
 	packageOrNil, rowWithPackageDecl := getPackageOrNil(gofile)
 	if packageOrNil == nil {
@@ -47,11 +58,6 @@ func processPackageInformation(gofile *gofilereader.Gofile, pfile *Pfile) error 
 	}
 	(*pfile).PackageAbsolutePath = *packageAbsolutePathOrNil
 	return nil
-}
-
-func deleteIndexOfSlice(slice *[]string, index int) *[]string {
-	sliceWithDelete := append((*slice)[:index], (*slice)[index + 1:]...)
-	return &sliceWithDelete
 }
 
 func getPackageOrNil(gofile *gofilereader.Gofile) (*string, int) {
@@ -77,6 +83,29 @@ func getPackageAbsolutePathOrNil(absolutePath string, packageName string) *strin
 	return &packageAbsolutePath
 }
 
-func processImportInformation(gofile *gofilereader.Gofile, pfile *Pfile) {
+/**
+ * Determines imports.
+ * Removes every import row.
+ */
+func processImportInformation(pfile *Pfile) {
+	goimports := (*pfile).Imports
+	for rowIdxWithImport, row := range (*pfile).Rows {
+		trimmed := strings.TrimSpace(row)
+		if strings.HasPrefix(trimmed, "import ") {
+			statement := strings.TrimPrefix(trimmed, "import ")
+			goimport := Goimport{getPrefixFromPath(statement), statement}
+			goimports = append(goimports, goimport)
+			(*pfile).Rows = *deleteIndexOfSlice(&(*pfile).Rows, rowIdxWithImport)
+		}
+	}
+	(*pfile).Imports = goimports
+}
 
+func getPrefixFromPath(path string) string {
+	elements := strings.Split(path, ".")
+	lastElement := path
+	for _, element := range elements {
+		lastElement = element
+	}
+	return lastElement
 }
