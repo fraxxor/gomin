@@ -49,7 +49,7 @@ func TestProcessGofile_Package(t *testing.T) {
 
 func TestProcessGofile_Import(t *testing.T) {
 	gofile := gofilereader.Gofile{	AbsolutePath: "test/testfolder/testpackage/test.go",
-											Rows: []string{"package testpackage", "import frax", "frax.doSmth()"}}
+											Rows: []string{"package testpackage", "import \"frax\"", "frax.doSmth()"}}
 	processor := new(ProcessGofileImpl)
 	pfile, err := processor.ProcessGofile(&gofile)
 	if err != nil {
@@ -60,11 +60,11 @@ func TestProcessGofile_Import(t *testing.T) {
 		t.Errorf("Expected one import, but was %d.\n", len((*pfile).Imports))
 		return
 	}
-	if !strings.EqualFold((*pfile).Imports[0].ImportPath(), "frax") {
-		t.Errorf("Expected <%s> but was <%s>.\n", "frax", ((*pfile).Imports[0]).ImportPath())
+	if !strings.EqualFold((*pfile).Imports[0].ImportPath(), "\"frax\"") {
+		t.Errorf("Expected <%s> but was <%s>.\n", "\"frax\"", ((*pfile).Imports[0]).ImportPath())
 	}
-	if !strings.EqualFold((*pfile).Imports[0].Prefix(), "frax") {
-		t.Errorf("Expected <%s> but was <%s>.\n", "frax", ((*pfile).Imports[0]).Prefix())
+	if !strings.EqualFold((*pfile).Imports[0].Prefix(), "\"frax\"") {
+		t.Errorf("Expected <%s> but was <%s>.\n", "\"frax\"", ((*pfile).Imports[0]).Prefix())
 	}
 	expectedRows := []string{"frax.doSmth()"}
 	if !areRowsEqual(expectedRows, (*pfile).Rows) {
