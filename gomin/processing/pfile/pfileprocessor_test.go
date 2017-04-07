@@ -55,11 +55,17 @@ func TestProcessGofile_Import(t *testing.T) {
 		t.Errorf("Expected no error.\n")
 		return
 	}
-	if (*pfile).Package != "testpackage" {
-		t.Errorf("Expected <testpackage> but was <%s>.\n", (*pfile).Package)
+	if len((*pfile).Imports) != 1 {
+		t.Errorf("Expected one import, but was %d.\n", len((*pfile).Imports))
+		return
 	}
-	if (*pfile).PackageAbsolutePath != "test/testfolder/testpackage" {
-		t.Errorf("Expected <test/testfolder/testpackage> but was <%s>.\n", (*pfile).PackageAbsolutePath)	
+	importFrax := Goimport{"", "frax"}
+	if (*pfile).Imports[0] == importFrax{
+		t.Errorf("Expected <%s> but was <%s>.\n", importFrax, (*pfile).Imports[0])
+	}
+	expectedRows := []string{"frax.doSmth()"}
+	if !areRowsEqual(expectedRows, (*pfile).Rows) {
+		t.Errorf("Expected <%s>, but was <%s>.\n", expectedRows, (*pfile).Rows)
 	}
 }
 

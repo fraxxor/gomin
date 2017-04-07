@@ -27,27 +27,41 @@ func (e InvalidAbsolutePackagePath) Error() string {
 
 func (processor *ProcessGofileImpl) ProcessGofile(gofile *gofilereader.Gofile) (*Pfile, error) {
 	pfile := Pfile{AbsolutePath: gofile.AbsolutePath, Rows: gofile.Rows}
-	packageOrNil := getPackageOrNil(gofile)
-	if packageOrNil == nil {
-		return nil, new (NoPackageError)
+	err := processPackageInformation(gofile, &pfile)
+	if err != nil {
+		return nil, err
 	}
-	pfile.Package = *packageOrNil
-	packageAbsolutePathOrNil := getPackageAbsolutePathOrNil(gofile.AbsolutePath, *packageOrNil)
-	if packageAbsolutePathOrNil == nil {
-		return nil, new (InvalidAbsolutePackagePath)
-	}
-	pfile.PackageAbsolutePath = *packageAbsolutePathOrNil
 	return &pfile, nil
 }
 
-func getPackageOrNil(gofile *gofilereader.Gofile) *string {
-	for _, row := range (*gofile).Rows {
+func processPackageInformation(gofile *gofilereader.Gofile, pfile *Pfile) error {
+	packageOrNil, rowWithPackageDecl := getPackageOrNil(gofile)
+	if packageOrNil == nil {
+		return new (NoPackageError)
+	}
+	(*pfile).Package = *packageOrNil 
+	(*pfile).Rows = *deleteIndexOfSlice(&(*pfile).Rows, rowWithPackageDecl)
+	packageAbsolutePathOrNil := getPackageAbsolutePathOrNil(gofile.AbsolutePath, *packageOrNil)
+	if packageAbsolutePathOrNil == nil {
+		return new (InvalidAbsolutePackagePath)
+	}
+	(*pfile).PackageAbsolutePath = *packageAbsolutePathOrNil
+	return nil
+}
+
+func deleteIndexOfSlice(slice *[]string, index int) *[]string {
+	sliceWithDelete := append((*slice)[:index], (*slice)[index + 1:]...)
+	return &sliceWithDelete
+}
+
+func getPackageOrNil(gofile *gofilereader.Gofile) (*string, int) {
+	for rowIdx, row := range (*gofile).Rows {
 		if strings.HasPrefix(strings.TrimSpace(row), "package ") {
 			packageName := strings.TrimPrefix(strings.TrimSpace(row), "package ")
-			return &packageName
+			return &packageName, rowIdx
 		}
 	}
-	return nil
+	return nil, -1
 }
 
 func getPackageAbsolutePathOrNil(absolutePath string, packageName string) *string {
@@ -61,4 +75,8 @@ func getPackageAbsolutePathOrNil(absolutePath string, packageName string) *strin
 	}
 	packageAbsolutePath := strings.TrimSuffix(canonicalPath, "/" + pathElements[len(pathElements) - 1])
 	return &packageAbsolutePath
+}
+
+func processImportInformation(gofile *gofilereader.Gofile, pfile *Pfile) {
+
 }
