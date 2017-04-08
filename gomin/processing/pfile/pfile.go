@@ -9,6 +9,10 @@ type Goimport struct {
 	importPath string
 }
 
+func CreateGoimport(prefix, importpath string) Goimport {
+	return Goimport{prefix, importpath}
+}
+
 func (g Goimport) HasPrefix() bool {
 	return g.prefix != ""
 }
