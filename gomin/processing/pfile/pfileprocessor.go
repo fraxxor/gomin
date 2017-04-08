@@ -89,23 +89,52 @@ func getPackageAbsolutePathOrNil(absolutePath string, packageName string) *strin
  */
 func processImportInformation(pfile *Pfile) {
 	goimports := (*pfile).Imports
+	rowsToDelete := make([]int, 0)
+	importcontext := false
 	for rowIdxWithImport, row := range (*pfile).Rows {
 		trimmed := strings.TrimSpace(row)
-		if strings.HasPrefix(trimmed, "import ") {
-			statement := strings.TrimPrefix(trimmed, "import ")
-			goimport := Goimport{getPrefixFromPath(statement), statement}
-			goimports = append(goimports, goimport)
-			(*pfile).Rows = *deleteIndexOfSlice(&(*pfile).Rows, rowIdxWithImport)
+		if !importcontext && strings.HasPrefix(trimmed, "import") {
+			statement := strings.TrimSpace(strings.TrimPrefix(trimmed, "import"))
+			if strings.HasPrefix(statement, "(") {
+				importcontext = true
+				statement = strings.TrimSpace(strings.TrimPrefix(statement, "("))
+			}
+			if len(statement) > 0 {
+				prefix, importpath := getContentsFromStatement(statement)
+				goimport := Goimport{prefix, importpath}
+				goimports = append(goimports, goimport)
+			}
+			rowsToDelete = append(rowsToDelete, rowIdxWithImport)
+		} else if importcontext {
+			if strings.HasSuffix(trimmed, ")") {
+				importcontext = false
+				trimmed = strings.TrimSpace(strings.TrimSuffix(trimmed, ")"))
+			}
+			if len(trimmed) > 0 {
+				prefix, importpath := getContentsFromStatement(trimmed)
+				goimport := Goimport{prefix, importpath}
+				goimports = append(goimports, goimport)
+			}
+			rowsToDelete = append(rowsToDelete, rowIdxWithImport)
 		}
+	}
+	for i := len(rowsToDelete) - 1; i >= 0; i = i - 1 {
+		(*pfile).Rows = *deleteIndexOfSlice(&(*pfile).Rows, rowsToDelete[i])
 	}
 	(*pfile).Imports = goimports
 }
 
-func getPrefixFromPath(path string) string {
-	elements := strings.Split(path, ".")
-	lastElement := path
-	for _, element := range elements {
-		lastElement = element
+func getContentsFromStatement(statement string) (string, string) {
+	if strings.HasPrefix(statement, "\"") {
+		elements := strings.Split(strings.Replace(statement, "\"", "", -1), ".")
+		lastElement := statement
+		for _, element := range elements {
+			lastElement = element
+		}
+		return lastElement, statement
+	} else if strings.HasPrefix(statement, ". ") {
+		return "", strings.TrimSpace(strings.TrimPrefix(statement, ". "))
 	}
-	return lastElement
+	words := strings.Split(statement, " ")
+	return words[0], strings.TrimSpace(strings.TrimPrefix(statement, words[0]))
 }
