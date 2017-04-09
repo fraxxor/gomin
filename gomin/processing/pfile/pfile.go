@@ -2,6 +2,7 @@ package pfile
 
 import(
 	"de.fraxxor.gofrax/gomin/input/gofilereader"
+	"strings"
 )
 
 type Goimport struct {
@@ -27,9 +28,12 @@ func (g Goimport) ImportPath() string {
 
 func (g Goimport) String() string {
 	if g.HasPrefix() {
-		return g.Prefix() + " " + g.ImportPath()
+		if strings.EqualFold(getLastElementOfImportPath(g.ImportPath()), g.Prefix()) {
+			return "\"" + g.ImportPath() + "\""
+		}
+		return g.Prefix() + " \"" + g.ImportPath() + "\""
 	}
-	return g.ImportPath()
+	return ". \"" + g.ImportPath() + "\""
 }
 
 type Pfile struct {
@@ -42,4 +46,13 @@ type Pfile struct {
 
 type PfileProcessor interface {
 	ProcessGofile(gofile *gofilereader.Gofile) (*Pfile, error)
+}
+
+func getLastElementOfImportPath(importpath string) string {
+	elements := strings.Split(strings.Replace(importpath, "\"", "", -1), ".")
+	lastElement := importpath
+	for _, element := range elements {
+		lastElement = element
+	}
+	return lastElement
 }

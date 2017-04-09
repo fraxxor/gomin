@@ -34,4 +34,18 @@ func (cleaner *ImportCleaner) Clean(fileToClean *pfile.Pfile) {
 		}
 		(*fileToClean).Rows[i] = cleanedRow
 	}
+	remainingImports := make([]pfile.Goimport, 0)
+	for _, remainingImport := range (*fileToClean).Imports {
+		keepImport := true
+		for _, importToClean := range importsToClean {
+			if remainingImport == importToClean {
+				keepImport = false
+				break
+			}
+		}
+		if keepImport {
+			remainingImports = append(remainingImports, remainingImport)
+		}
+	}
+	(*fileToClean).Imports = remainingImports
 }

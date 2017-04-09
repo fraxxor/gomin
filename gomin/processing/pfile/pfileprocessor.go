@@ -126,12 +126,7 @@ func processImportInformation(pfile *Pfile) {
 
 func getContentsFromStatement(statement string) (string, string) {
 	if strings.HasPrefix(statement, "\"") {
-		elements := strings.Split(strings.Replace(statement, "\"", "", -1), ".")
-		lastElement := statement
-		for _, element := range elements {
-			lastElement = element
-		}
-		return lastElement, statement
+		return getLastElementOfImportPath(statement), statement
 	} else if strings.HasPrefix(statement, ". ") {
 		return "", strings.TrimSpace(strings.TrimPrefix(statement, ". "))
 	}

@@ -15,6 +15,20 @@ func TestClean_NothingToReplace(t *testing.T) {
 	}
 }
 
+func TestClean_NoReplaceDueToNoOwnPFile(t *testing.T) {
+	rows := []string{"api.doSmth"}
+	expRows := []string{"api.doSmth"}
+	file := pfile.Pfile{"", rows, []pfile.Goimport{pfile.CreateGoimport("api", "api")}, "", ""}
+	cleaner := CreateImportCleaner(&[]pfile.Pfile{file})
+	cleaner.Clean(&file)
+	if !areRowsEqual(file.Rows, expRows) {
+		t.Errorf("Expected <%s> but was <%s>.\n", expRows, file.Rows)
+	}
+	if len(file.Imports) != 1 {
+		t.Errorf("Expected import <%s> but was <%s>.\n", "api \"api\"", file.Imports)
+	}
+}
+
 func TestClean_NoReplaceDueToDot(t *testing.T) {
 	rows := []string{"doSmth"}
 	expRows := []string{"doSmth"}
@@ -25,16 +39,8 @@ func TestClean_NoReplaceDueToDot(t *testing.T) {
 	if !areRowsEqual(file.Rows, expRows) {
 		t.Errorf("Expected <%s> but was <%s>.\n", expRows, file.Rows)
 	}
-}
-
-func TestClean_NoReplaceDueToNoOwnPFile(t *testing.T) {
-	rows := []string{"api.doSmth"}
-	expRows := []string{"api.doSmth"}
-	file := pfile.Pfile{"", rows, []pfile.Goimport{pfile.CreateGoimport("api", "api")}, "", ""}
-	cleaner := CreateImportCleaner(&[]pfile.Pfile{file})
-	cleaner.Clean(&file)
-	if !areRowsEqual(file.Rows, expRows) {
-		t.Errorf("Expected <%s> but was <%s>.\n", expRows, file.Rows)
+	if len(file.Imports) > 0 {
+		t.Errorf("Expected no more imports but was <%s>.\n", file.Imports)
 	}
 }
 
@@ -48,6 +54,9 @@ func TestClean_ReplaceSimple(t *testing.T) {
 	if !areRowsEqual(file.Rows, expRows) {
 		t.Errorf("Expected <%s> but was <%s>.\n", expRows, file.Rows)
 	}
+	if len(file.Imports) > 0 {
+		t.Errorf("Expected no more imports but was <%s>.\n", file.Imports)
+	}
 }
 
 func TestClean_ReplaceAlias(t *testing.T) {
@@ -59,6 +68,9 @@ func TestClean_ReplaceAlias(t *testing.T) {
 	cleaner.Clean(&file)
 	if !areRowsEqual(file.Rows, expRows) {
 		t.Errorf("Expected <%s> but was <%s>.\n", expRows, file.Rows)
+	}
+	if len(file.Imports) > 0 {
+		t.Errorf("Expected no more imports but was <%s>.\n", file.Imports)
 	}
 }
 
