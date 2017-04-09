@@ -6,25 +6,32 @@ import(
 )
 
 type ImportCleaner struct {
-	goimports *[]pfile.Goimport
+	replacableImports *[]string
 }
 
 func CreateImportCleaner(pfiles *[]pfile.Pfile) *ImportCleaner {
-	allGoimports := make([]pfile.Goimport, 0)
+	allreplacableImports := make([]string, 0)
 	for _, pfile := range *pfiles {
-		for _, goimport := range pfile.Imports {
-			allGoimports = append(allGoimports, goimport)
-		}
+		allreplacableImports = append(allreplacableImports, pfile.PackageAbsolutePath)
 	}
-	return &ImportCleaner{&allGoimports}
+	return &ImportCleaner{&allreplacableImports}
 }
 
-func (cleaner *ImportCleaner) Clean(pfile *pfile.Pfile) {
-	cleanedRows := make([]string, 0)
-	for _, row := range (*pfile).Rows {
-		if !strings.HasPrefix(strings.TrimSpace(row), "import ") {
-			cleanedRows = append(cleanedRows, row)
+func (cleaner *ImportCleaner) Clean(fileToClean *pfile.Pfile) {
+	importsToClean := make([]pfile.Goimport, 0)
+	for _, goimport := range fileToClean.Imports {
+		for _, replacable := range *cleaner.replacableImports {
+			if strings.EqualFold(goimport.ImportPath(), replacable) {
+				importsToClean = append(importsToClean, goimport)
+				break
+			}
 		}
 	}
-	(*pfile).Rows = cleanedRows
+	for i, row := range (*fileToClean).Rows {
+		cleanedRow := row
+		for _, importToClean := range importsToClean {
+			cleanedRow = strings.Replace(cleanedRow, importToClean.Prefix() + ".", "", -1)
+		}
+		(*fileToClean).Rows[i] = cleanedRow
+	}
 }
