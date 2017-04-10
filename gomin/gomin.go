@@ -5,6 +5,7 @@ import (
 	"de.fraxxor.gofrax/gomin/input/gofilereader"
 	"de.fraxxor.gofrax/gomin/input/godirectoryreader"
 	"de.fraxxor.gofrax/gomin/input/gofilecollector"
+	"de.fraxxor.gofrax/gomin/processing/pfile"
 )
 
 func main() {
@@ -28,7 +29,14 @@ func main() {
 	dirReaderAbstr = dirReader
 	dirCollector := gofilecollector.MakeGofilecollector(&dirReaderAbstr, &reader)
 	gofilesRecursive := dirCollector.CollectRecursive("D:/Programmierung/Go/src/de.fraxxor.gofrax/gomin")
+	var processor pfile.PfileProcessor
+	processor = new(pfile.ProcessGofileImpl)
 	for _, gf := range gofilesRecursive {
-		fmt.Printf("+++\n%s\n---\n", &gf)
+		fmt.Printf("Gofile: %s\n", gf.AbsolutePath)
+		processedFile, err := processor.ProcessGofile(&gf)
+		if (err != nil) {
+			panic(err)
+		}
+		fmt.Printf("Pfile: %s\n", (*processedFile).PackageAbsolutePath)
 	}
 }
