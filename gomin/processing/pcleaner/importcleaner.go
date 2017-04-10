@@ -1,6 +1,6 @@
 package pcleaner
 
-import(
+import (
 	"de.fraxxor.gofrax/gomin/processing/pfile"
 	"strings"
 )
