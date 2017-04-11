@@ -16,13 +16,20 @@ func TestProcessGofile_NoPackage(t *testing.T) {
 	}
 }
 
-func TestProcessGofile_InvalidPackageAbsolutePath(t *testing.T) {
+func TestProcessGofile_UnequalPackageAbsolutePath(t *testing.T) {
 	gofile := gofilereader.Gofile{	AbsolutePath: "apple/test/test.go",
 											Rows: []string{"package apple", "12345"}}
 	processor := new(ProcessGofileImpl)
-	_,err := processor.ProcessGofile(&gofile)
-	if err == nil {
-		t.Errorf("Expected error.\n")
+	pfile, err := processor.ProcessGofile(&gofile)
+	if err != nil {
+		t.Errorf("Expected no error.\n")
+		return
+	}
+	if (*pfile).Package != "apple" {
+		t.Errorf("Expected <testpackage> but was <%s>.\n", (*pfile).Package)
+	}
+	if (*pfile).PackageAbsolutePath != "apple/test" {
+		t.Errorf("Expected <apple/test> but was <%s>.\n", (*pfile).PackageAbsolutePath)	
 	}
 }
 

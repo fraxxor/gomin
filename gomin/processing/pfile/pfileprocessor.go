@@ -3,6 +3,7 @@ package pfile
 import(
 	"de.fraxxor.gofrax/gomin/input/gofilereader"
 	"strings"
+	"log"
 )
 
 type ProcessGofileImpl struct {
@@ -76,10 +77,11 @@ func getPackageAbsolutePathOrNil(absolutePath string, packageName string) *strin
 	if !strings.HasSuffix(pathElements[len(pathElements) - 1], ".go") {
 		return nil
 	}
-	if pathElements[len(pathElements) - 2] != packageName {
-		return nil
-	}
 	packageAbsolutePath := strings.TrimSuffix(canonicalPath, "/" + pathElements[len(pathElements) - 1])
+	if pathElements[len(pathElements) - 2] != packageName {
+		log.SetPrefix("WARN ")
+		log.Printf("Package <%s> differs from Filepath <%s>.\n", packageName, packageAbsolutePath)
+	}
 	return &packageAbsolutePath
 }
 
