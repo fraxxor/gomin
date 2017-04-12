@@ -25,11 +25,13 @@ func (provider *PfileproviderImpl) AddCleaner(cleaner *pcleaner.Pcleaner) {
 }
 
 func (provider *PfileproviderImpl) ProcessFiles(gofiles *[]gofilereader.Gofile) *[]pfile.Pfile {
+	pfiles := make([]pfile.Pfile, 0)
 	for _, gofile := range *gofiles {
-		_, err := (*provider.processor).ProcessGofile(&gofile)
-		if (err != nil) {
+		pfile, err := (*provider.processor).ProcessGofile(&gofile)
+		if err != nil {
 			panic(err)
 		}
+		pfiles = append(pfiles, *pfile)
 	}
-	return nil
+	return &pfiles
 }
