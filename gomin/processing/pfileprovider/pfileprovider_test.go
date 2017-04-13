@@ -4,6 +4,7 @@ import (
 	"testing"
 	"de.fraxxor.gofrax/gomin/input/gofilereader"
 	"de.fraxxor.gofrax/gomin/processing/pfile"
+	"de.fraxxor.gofrax/gomin/processing/pcleaner"
 )
 
 func TestProcessFiles_CallToProcessorTwice(t *testing.T) {
@@ -25,13 +26,37 @@ func TestProcessFiles_DeliverPfilesFromProcessor(t *testing.T) {
 	var processor pfile.PfileProcessor
 	processor = &stub
 	provider := CreateProvider(&processor)
-	returnFiles := provider.ProcessFiles(&[]gofilereader.Gofile{gofile1})
-	if len(*returnFiles) != 1 {
-		t.Errorf("Expected one pfile but were %d.\n", len(*returnFiles))
+	provider.ProcessFiles(&[]gofilereader.Gofile{gofile1})
+	returnFiles := provider.GetFiles()
+	if len(returnFiles) != 1 {
+		t.Errorf("Expected one pfile but were %d.\n", len(returnFiles))
 		return
 	}
-	if (*returnFiles)[0].Package != pfile1.Package {
-		t.Errorf("Expected <%v> but was <%v>.\n", pfile1, (*returnFiles)[0])
+	if (returnFiles)[0].Package != pfile1.Package {
+		t.Errorf("Expected <%v> but was <%v>.\n", pfile1, (returnFiles)[0])
+	}
+}
+
+func TestProcessFiles_ApplyCleaner(t *testing.T) {
+	gofile1 := gofilereader.Gofile{}
+	pfile1 := pfile.Pfile{Package: "Test"}
+	stub := PfileprocessorStub{pfile1}
+	var processor pfile.PfileProcessor
+	processor = &stub
+	provider := CreateProvider(&processor)
+	provider.ProcessFiles(&[]gofilereader.Gofile{gofile1})
+	cleanerStub := PcleanerStub{"Replaced"}
+	var cleaner pcleaner.Pcleaner
+	cleaner = &cleanerStub
+	provider.AddCleaner(&cleaner)
+	provider.CleanFiles()
+	returnFiles := provider.GetFiles()
+	if len(returnFiles) != 1 {
+		t.Errorf("Expected one pfile but were %d.\n", len(returnFiles))
+		return
+	}
+	if (returnFiles)[0].Package != cleanerStub.packageToApply {
+		t.Errorf("Expected <%v> but was <%v>.\n", cleanerStub.packageToApply, (returnFiles)[0].Package)
 	}
 }
 
@@ -50,4 +75,12 @@ type PfileprocessorStub struct {
 
 func (stub *PfileprocessorStub) ProcessGofile(gofile *gofilereader.Gofile) (*pfile.Pfile, error) {
 	return &stub.returnFile, nil
+}
+
+type PcleanerStub struct {
+	packageToApply string
+}
+
+func (stub *PcleanerStub) Clean(pfile *pfile.Pfile) {
+	(*pfile).Package = stub.packageToApply
 }
