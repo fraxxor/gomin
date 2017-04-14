@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+    "path/filepath"
 	"de.fraxxor.gofrax/gomin/input/gofilereader"
 	"de.fraxxor.gofrax/gomin/input/godirectoryreader"
 	"de.fraxxor.gofrax/gomin/input/gofilecollector"
@@ -9,6 +11,10 @@ import (
 )
 
 func main() {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err == nil {
+		fmt.Printf("Filename is <%s>.\n", dir)
+	}
 	fmt.Println("Hello World")
 	var reader gofilereader.Gofilereader
 	reader = new(gofilereader.GofilereaderFS)
