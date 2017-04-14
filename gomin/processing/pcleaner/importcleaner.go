@@ -9,7 +9,7 @@ type ImportCleaner struct {
 	replacableImports *[]string
 }
 
-func CreateImportCleaner(pfiles *[]pfile.Pfile) *ImportCleaner {
+func CreateImportCleaner(pfiles *[]*pfile.Pfile) *ImportCleaner {
 	allreplacableImports := make([]string, 0)
 	for _, pfile := range *pfiles {
 		allreplacableImports = append(allreplacableImports, pfile.PackageAbsolutePath)

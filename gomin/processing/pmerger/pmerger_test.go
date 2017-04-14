@@ -8,7 +8,7 @@ import (
 
 func TestMerge_Empty(t *testing.T) {
 	merger := CreateMerger()
-	mergefile := merger.Merge(&[]pfile.Pfile{})
+	mergefile := merger.Merge(&[]*pfile.Pfile{})
 	if len(mergefile.Rows) > 0 {
 		t.Errorf("Expected empty rows but was <%s>.\n", mergefile.Rows)
 	}
@@ -20,7 +20,7 @@ func TestMerge_Empty(t *testing.T) {
 func TestMerge_Single(t *testing.T) {
 	merger := CreateMerger()
 	singleFile := pfile.Pfile{Rows: []string{"Test"}, Imports: []pfile.Goimport{pfile.CreateGoimport("imp", "imp")}}
-	mergefile := merger.Merge(&[]pfile.Pfile{singleFile})
+	mergefile := merger.Merge(&[]*pfile.Pfile{&singleFile})
 	if len(mergefile.Rows) != 1 {
 		t.Errorf("Expected one row but was <#%d: %s>.\n", len(mergefile.Rows), mergefile.Rows)
 	}

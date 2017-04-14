@@ -22,7 +22,7 @@ func (file Mergefile) String() string {
 }
 
 type Pmerger interface {
-	Merge (pfiles *[]pfile.Pfile) *Mergefile
+	Merge (pfiles *[]*pfile.Pfile) *Mergefile
 }
 
 type PmergerImpl struct {
@@ -33,20 +33,20 @@ func CreateMerger() *PmergerImpl {
 	return &PmergerImpl{}
 }
 
-func (merger *PmergerImpl) Merge(pfiles *[]pfile.Pfile) *Mergefile {
+func (merger *PmergerImpl) Merge(pfiles *[]*pfile.Pfile) *Mergefile {
 	rowsize := 0
 	importsize := 0
 	for _, onefile := range *pfiles {
-		rowsize = rowsize + len(onefile.Rows)
-		importsize = importsize + len(onefile.Imports)
+		rowsize = rowsize + len((*onefile).Rows)
+		importsize = importsize + len((*onefile).Imports)
 	}
 	rows := make([]string, 0, rowsize)
 	imports := make([]pfile.Goimport, 0, importsize)
 	for _, onefile := range *pfiles {
-		for _, row := range onefile.Rows {
+		for _, row := range (*onefile).Rows {
 			rows = append(rows, row)
 		}
-		for _, goimport := range onefile.Imports {
+		for _, goimport := range (*onefile).Imports {
 			imports = append(imports, goimport)
 		}
 	}
