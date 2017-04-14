@@ -33,6 +33,26 @@ func TestProcessGofile_UnequalPackageAbsolutePath(t *testing.T) {
 	}
 }
 
+func TestProcessGofile_FilterTestFile(t *testing.T) {
+	gofile := gofilereader.Gofile{	AbsolutePath: "test/testfolder/testpackage/test_test.go",
+											Rows: []string{"package testpackage", "12345"}}
+	processor := new(ProcessGofileImpl)
+	_, err := processor.ProcessGofile(&gofile)
+	if err != NoProductiveGoFile {
+		t.Errorf("Expected error <%s> but was <%s>.\n", NoProductiveGoFile, err)
+	}
+}
+
+func TestProcessGofile_FilterNotGoFile(t *testing.T) {
+	gofile := gofilereader.Gofile{	AbsolutePath: "test/testfolder/testpackage/test.txt",
+											Rows: []string{"package testpackage", "12345"}}
+	processor := new(ProcessGofileImpl)
+	_, err := processor.ProcessGofile(&gofile)
+	if err != NoProductiveGoFile {
+		t.Errorf("Expected error <%s> but was <%s>.\n", NoProductiveGoFile, err)
+	}
+}
+
 func TestProcessGofile_Package(t *testing.T) {
 	gofile := gofilereader.Gofile{	AbsolutePath: "test/testfolder/testpackage/test.go",
 											Rows: []string{"package testpackage", "12345"}}

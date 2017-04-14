@@ -5,6 +5,10 @@ import(
 	"strings"
 )
 
+var(
+	NoProductiveGoFile = new(noProductiveGoFile)
+)
+
 type Goimport struct {
 	prefix string
 	importPath string
@@ -42,6 +46,14 @@ type Pfile struct {
 	Imports []Goimport
 	Package string
 	PackageAbsolutePath string
+}
+
+type noProductiveGoFile struct {
+
+}
+
+func (err noProductiveGoFile) Error() string {
+	return "Not a productive Go file."
 }
 
 type PfileProcessor interface {

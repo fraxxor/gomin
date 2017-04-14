@@ -30,11 +30,12 @@ func (provider *PfileproviderImpl) AddCleaner(cleaner *pcleaner.Pcleaner) {
 
 func (provider *PfileproviderImpl) ProcessFiles(gofiles *[]gofilereader.Gofile) {
 	for _, gofile := range *gofiles {
-		pfile, err := (*provider.processor).ProcessGofile(&gofile)
-		if err != nil {
+		file, err := (*provider.processor).ProcessGofile(&gofile)
+		if err == nil {
+			provider.pfiles = append(provider.pfiles, file)
+		} else if err != pfile.NoProductiveGoFile {
 			panic(err)
 		}
-		provider.pfiles = append(provider.pfiles, pfile)
 	}
 }
 

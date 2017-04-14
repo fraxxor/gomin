@@ -7,6 +7,19 @@ import (
 	"de.fraxxor.gofrax/gomin/processing/pcleaner"
 )
 
+func TestProcessFiles_WhenNotAGofileThenLeaveItOut(t *testing.T) {
+	stub := PfileprocessorErrStub{}
+	var processor pfile.PfileProcessor
+	processor = &stub
+	provider := CreateProvider(&processor)
+	gofiles := []gofilereader.Gofile{gofilereader.Gofile{}, gofilereader.Gofile{}}
+	provider.ProcessFiles(&gofiles)
+	returnFiles := provider.GetFiles()
+	if len(returnFiles) > 0 {
+		t.Errorf("Expected no productive File but found %d.\n", len(returnFiles))
+	}
+}
+
 func TestProcessFiles_CallToProcessorTwice(t *testing.T) {
 	sniffer := PfileprocessorSniffer{}
 	var processor pfile.PfileProcessor
@@ -83,4 +96,12 @@ type PcleanerStub struct {
 
 func (stub *PcleanerStub) Clean(pfile *pfile.Pfile) {
 	(*pfile).Package = stub.packageToApply
+}
+
+type PfileprocessorErrStub struct {
+
+}
+
+func (stub *PfileprocessorErrStub) ProcessGofile(gofile *gofilereader.Gofile) (*pfile.Pfile, error) {
+	return nil, pfile.NoProductiveGoFile
 }

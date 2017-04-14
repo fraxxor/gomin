@@ -18,15 +18,10 @@ func (e NoPackageError) Error() string {
 	return "No package declaration found."
 }
 
-type InvalidAbsolutePackagePath struct {
-
-}
-
-func (e InvalidAbsolutePackagePath) Error() string {
-	return "Invalid absolute package path."
-}
-
 func (processor *ProcessGofileImpl) ProcessGofile(gofile *gofilereader.Gofile) (*Pfile, error) {
+	if isNotAProductiveGoFile(gofile.AbsolutePath) {
+		return nil, NoProductiveGoFile
+	}
 	pfile := Pfile{AbsolutePath: gofile.AbsolutePath, Rows: gofile.Rows}
 	err := processPackageInformation(gofile, &pfile)
 	if err != nil {
@@ -34,6 +29,16 @@ func (processor *ProcessGofileImpl) ProcessGofile(gofile *gofilereader.Gofile) (
 	}
 	processImportInformation(&pfile)
 	return &pfile, nil
+}
+
+func isNotAProductiveGoFile(path string) bool {
+	if strings.HasSuffix(path, "_test.go") {
+		return true
+	}
+	if strings.HasSuffix(path, ".go") {
+		return false
+	}
+	return true
 }
 
 func deleteIndexOfSlice(slice *[]string, index int) *[]string {
@@ -53,11 +58,8 @@ func processPackageInformation(gofile *gofilereader.Gofile, pfile *Pfile) error 
 	}
 	(*pfile).Package = *packageOrNil 
 	(*pfile).Rows = *deleteIndexOfSlice(&(*pfile).Rows, rowWithPackageDecl)
-	packageAbsolutePathOrNil := getPackageAbsolutePathOrNil(gofile.AbsolutePath, *packageOrNil)
-	if packageAbsolutePathOrNil == nil {
-		return new (InvalidAbsolutePackagePath)
-	}
-	(*pfile).PackageAbsolutePath = *packageAbsolutePathOrNil
+	packageAbsolutePath := getPackageAbsolutePath(gofile.AbsolutePath, *packageOrNil)
+	(*pfile).PackageAbsolutePath = *packageAbsolutePath
 	return nil
 }
 
@@ -71,12 +73,9 @@ func getPackageOrNil(gofile *gofilereader.Gofile) (*string, int) {
 	return nil, -1
 }
 
-func getPackageAbsolutePathOrNil(absolutePath string, packageName string) *string {
+func getPackageAbsolutePath(absolutePath string, packageName string) *string {
 	canonicalPath := strings.Replace(absolutePath, "\\", "/", -1)
 	pathElements := strings.Split(canonicalPath, "/")
-	if !strings.HasSuffix(pathElements[len(pathElements) - 1], ".go") {
-		return nil
-	}
 	packageAbsolutePath := strings.TrimSuffix(canonicalPath, "/" + pathElements[len(pathElements) - 1])
 	if pathElements[len(pathElements) - 2] != packageName {
 		log.SetPrefix("WARN ")
