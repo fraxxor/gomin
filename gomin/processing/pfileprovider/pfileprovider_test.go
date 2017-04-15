@@ -15,8 +15,8 @@ func TestProcessFiles_WhenNotAGofileThenLeaveItOut(t *testing.T) {
 	gofiles := []gofilereader.Gofile{gofilereader.Gofile{}, gofilereader.Gofile{}}
 	provider.ProcessFiles(&gofiles)
 	returnFiles := provider.GetFiles()
-	if len(returnFiles) > 0 {
-		t.Errorf("Expected no productive File but found %d.\n", len(returnFiles))
+	if len(*returnFiles) > 0 {
+		t.Errorf("Expected no productive File but found %d.\n", len(*returnFiles))
 	}
 }
 
@@ -41,12 +41,12 @@ func TestProcessFiles_DeliverPfilesFromProcessor(t *testing.T) {
 	provider := CreateProvider(&processor)
 	provider.ProcessFiles(&[]gofilereader.Gofile{gofile1})
 	returnFiles := provider.GetFiles()
-	if len(returnFiles) != 1 {
-		t.Errorf("Expected one pfile but were %d.\n", len(returnFiles))
+	if len(*returnFiles) != 1 {
+		t.Errorf("Expected one pfile but were %d.\n", len(*returnFiles))
 		return
 	}
-	if (returnFiles)[0].Package != pfile1.Package {
-		t.Errorf("Expected <%v> but was <%v>.\n", pfile1, (returnFiles)[0])
+	if (*returnFiles)[0].Package != pfile1.Package {
+		t.Errorf("Expected <%v> but was <%v>.\n", pfile1, (*returnFiles)[0])
 	}
 }
 
@@ -64,12 +64,12 @@ func TestProcessFiles_ApplyCleaner(t *testing.T) {
 	provider.AddCleaner(&cleaner)
 	provider.CleanFiles()
 	returnFiles := provider.GetFiles()
-	if len(returnFiles) != 1 {
-		t.Errorf("Expected one pfile but were %d.\n", len(returnFiles))
+	if len(*returnFiles) != 1 {
+		t.Errorf("Expected one pfile but were %d.\n", len(*returnFiles))
 		return
 	}
-	if (returnFiles)[0].Package != cleanerStub.packageToApply {
-		t.Errorf("Expected <%v> but was <%v>.\n", cleanerStub.packageToApply, (returnFiles)[0].Package)
+	if (*returnFiles)[0].Package != cleanerStub.packageToApply {
+		t.Errorf("Expected <%v> but was <%v>.\n", cleanerStub.packageToApply, (*returnFiles)[0].Package)
 	}
 }
 

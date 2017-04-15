@@ -10,18 +10,18 @@ type Pfileprovider interface {
 	AddCleaner(cleaner *pcleaner.Pcleaner)
 	ProcessFiles(gofiles *[]gofilereader.Gofile)
 	CleanFiles()
-	GetFiles() []*pfile.Pfile
+	GetFiles() *[]*pfile.Pfile
 }
 
 type PfileproviderImpl struct {
 	processor *pfile.PfileProcessor
 	cleaners []*pcleaner.Pcleaner
-	pfiles []*pfile.Pfile
+	pfiles *[]*pfile.Pfile
 }
 
 func CreateProvider(processor *pfile.PfileProcessor) *PfileproviderImpl {
 	pfiles := make([]*pfile.Pfile, 0)
-	return &PfileproviderImpl{processor, make([]*pcleaner.Pcleaner, 0), pfiles}
+	return &PfileproviderImpl{processor, make([]*pcleaner.Pcleaner, 0), &pfiles}
 }
 
 func (provider *PfileproviderImpl) AddCleaner(cleaner *pcleaner.Pcleaner) {
@@ -32,7 +32,7 @@ func (provider *PfileproviderImpl) ProcessFiles(gofiles *[]gofilereader.Gofile) 
 	for _, gofile := range *gofiles {
 		file, err := (*provider.processor).ProcessGofile(&gofile)
 		if err == nil {
-			provider.pfiles = append(provider.pfiles, file)
+			*provider.pfiles = append(*provider.pfiles, file)
 		} else if err != pfile.NoProductiveGoFile {
 			panic(err)
 		}
@@ -40,13 +40,13 @@ func (provider *PfileproviderImpl) ProcessFiles(gofiles *[]gofilereader.Gofile) 
 }
 
 func (provider *PfileproviderImpl) CleanFiles() {
-	for _, pfile := range provider.pfiles {
-		for _, cleaner := range provider.cleaners {
+	for _, cleaner := range provider.cleaners {
+		for _, pfile := range *provider.pfiles {
 			(*cleaner).Clean(pfile)
 		}
 	}
 }
 
-func (provider *PfileproviderImpl) GetFiles() []*pfile.Pfile {
+func (provider *PfileproviderImpl) GetFiles() *[]*pfile.Pfile {
 	return provider.pfiles
 }

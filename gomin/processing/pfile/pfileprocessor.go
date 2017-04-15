@@ -102,10 +102,15 @@ func processImportInformation(pfile *Pfile) {
 			}
 			if len(statement) > 0 {
 				prefix, importpath := getContentsFromStatement(statement)
-				goimport := Goimport{prefix, importpath}
+				goimport := CreateGoimport(prefix, cleanseImportpathFromQuotes(importpath))
 				goimports = append(goimports, goimport)
 			}
 			rowsToDelete = append(rowsToDelete, rowIdxWithImport)
+		} else if !importcontext{
+			if len(trimmed) > 0 {
+				// Productive row terminates imports
+				break	
+			}
 		} else if importcontext {
 			if strings.HasSuffix(trimmed, ")") {
 				importcontext = false
@@ -113,7 +118,7 @@ func processImportInformation(pfile *Pfile) {
 			}
 			if len(trimmed) > 0 {
 				prefix, importpath := getContentsFromStatement(trimmed)
-				goimport := Goimport{prefix, importpath}
+				goimport := CreateGoimport(prefix, cleanseImportpathFromQuotes(importpath))
 				goimports = append(goimports, goimport)
 			}
 			rowsToDelete = append(rowsToDelete, rowIdxWithImport)
@@ -133,4 +138,11 @@ func getContentsFromStatement(statement string) (string, string) {
 	}
 	words := strings.Split(statement, " ")
 	return words[0], strings.TrimSpace(strings.TrimPrefix(statement, words[0]))
+}
+
+func cleanseImportpathFromQuotes(importpath string) string {
+	if strings.HasPrefix(importpath, "\"") && strings.HasSuffix(importpath, "\"") {
+		return strings.TrimSuffix(strings.TrimPrefix(importpath, "\""), "\"")
+	}
+	return importpath
 }

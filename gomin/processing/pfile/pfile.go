@@ -15,6 +15,9 @@ type Goimport struct {
 }
 
 func CreateGoimport(prefix, importpath string) Goimport {
+	if strings.HasPrefix(importpath, "\"") || strings.HasSuffix(importpath, "\"") {
+		panic("Importpath must be without quotations.")
+	}
 	return Goimport{prefix, importpath}
 }
 

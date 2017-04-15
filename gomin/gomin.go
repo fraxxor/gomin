@@ -42,7 +42,7 @@ func main() {
 	packagecleaner = pcleaner.CreatePackagePathCleaner(pathToRoot)
 
 	var importcleaner pcleaner.Pcleaner
-	importcleaner = pcleaner.CreateImportCleaner(&processedPfiles)
+	importcleaner = pcleaner.CreateImportCleaner(processedPfiles)
 
 	provider.AddCleaner(&packagecleaner)
 	provider.AddCleaner(&importcleaner)
@@ -53,8 +53,8 @@ func main() {
 	var merger pmerger.Pmerger
 	merger = pmerger.CreateMerger()
 
-	mergefile := merger.Merge(&cleanedFiles)
-	fmt.Println(mergefile)
+	mergefile := merger.Merge(cleanedFiles)
+	fmt.Printf("Mergefile:\n%s\n", mergefile)
 }
 
 func getRootPath() string {

@@ -6,18 +6,16 @@ import (
 )
 
 type ImportCleaner struct {
+	filesToScan *[]*pfile.Pfile
 	replacableImports *[]string
 }
 
 func CreateImportCleaner(pfiles *[]*pfile.Pfile) *ImportCleaner {
-	allreplacableImports := make([]string, 0)
-	for _, pfile := range *pfiles {
-		allreplacableImports = append(allreplacableImports, pfile.PackageAbsolutePath)
-	}
-	return &ImportCleaner{&allreplacableImports}
+	return &ImportCleaner{pfiles, nil}
 }
 
 func (cleaner *ImportCleaner) Clean(fileToClean *pfile.Pfile) {
+	cleaner.scanFilesIfNil()
 	importsToClean := make([]pfile.Goimport, 0)
 	for _, goimport := range fileToClean.Imports {
 		for _, replacable := range *cleaner.replacableImports {
@@ -48,4 +46,14 @@ func (cleaner *ImportCleaner) Clean(fileToClean *pfile.Pfile) {
 		}
 	}
 	(*fileToClean).Imports = remainingImports
+}
+
+func (cleaner *ImportCleaner) scanFilesIfNil() {
+	if (cleaner.replacableImports == nil) {
+		allreplacableImports := make([]string, 0)
+		for _, pfile := range *(cleaner.filesToScan) {
+			allreplacableImports = append(allreplacableImports, pfile.PackageAbsolutePath)
+		}
+		cleaner.replacableImports = &allreplacableImports
+	}
 }
