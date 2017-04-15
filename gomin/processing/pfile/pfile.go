@@ -18,6 +18,9 @@ func CreateGoimport(prefix, importpath string) Goimport {
 	if strings.HasPrefix(importpath, "\"") || strings.HasSuffix(importpath, "\"") {
 		panic("Importpath must be without quotations.")
 	}
+	if strings.Contains(prefix, "/") {
+		panic("Prefix must not contain slashes.")
+	}
 	return Goimport{prefix, importpath}
 }
 
@@ -64,7 +67,7 @@ type PfileProcessor interface {
 }
 
 func getLastElementOfImportPath(importpath string) string {
-	elements := strings.Split(strings.Replace(importpath, "\"", "", -1), ".")
+	elements := strings.Split(strings.Replace(importpath, "\"", "", -1), "/")
 	lastElement := importpath
 	for _, element := range elements {
 		lastElement = element
