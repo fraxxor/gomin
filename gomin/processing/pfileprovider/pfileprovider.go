@@ -4,6 +4,7 @@ import (
 	"de.fraxxor.gofrax/gomin/input/gofilereader"
 	"de.fraxxor.gofrax/gomin/processing/pfile"
 	"de.fraxxor.gofrax/gomin/processing/pcleaner"
+	"log"
 )
 
 type Pfileprovider interface {
@@ -33,7 +34,10 @@ func (provider *PfileproviderImpl) ProcessFiles(gofiles *[]gofilereader.Gofile) 
 		file, err := (*provider.processor).ProcessGofile(&gofile)
 		if err == nil {
 			*provider.pfiles = append(*provider.pfiles, file)
-		} else if err != pfile.NoProductiveGoFile {
+		} else if err == pfile.NoProductiveGoFile {
+			log.SetPrefix("INFO ")
+			log.Printf("Skipped non productive file <%s>.\n", gofile.AbsolutePath)
+		} else {
 			panic(err)
 		}
 	}

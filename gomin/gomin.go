@@ -16,7 +16,6 @@ import (
 func main() {
 	pathOfExec := getRootPath()
 	pathOfExec = "D:/Programmierung/Go/src/de.fraxxor.gofrax/gomin"
-	pathToRoot := "D:/Programmierung/Go/src"
 	
 	var reader gofilereader.Gofilereader
 	reader = new(gofilereader.GofilereaderFS)
@@ -39,7 +38,7 @@ func main() {
 	processedPfiles := provider.GetFiles()
 
 	var packagecleaner pcleaner.Pcleaner
-	packagecleaner = pcleaner.CreatePackagePathCleaner(pathToRoot)
+	packagecleaner = pcleaner.CreatePackagePathCleaner(pathOfExec)
 
 	var importcleaner pcleaner.Pcleaner
 	importcleaner = pcleaner.CreateImportCleaner(processedPfiles)
