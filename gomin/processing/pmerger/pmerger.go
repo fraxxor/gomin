@@ -47,8 +47,19 @@ func (merger *PmergerImpl) Merge(pfiles *[]*pfile.Pfile) *Mergefile {
 			rows = append(rows, row)
 		}
 		for _, goimport := range (*onefile).Imports {
-			imports = append(imports, goimport)
+			if !containsGoimport(imports, goimport) {
+				imports = append(imports, goimport)
+			}
 		}
 	}
 	return &Mergefile{Package: "main", Rows: rows, Imports: imports}
+}
+
+func containsGoimport(goimports []pfile.Goimport, goimport pfile.Goimport) bool {
+	for _, checkImport := range goimports {
+		if checkImport == goimport {
+			return true
+		}
+	}
+	return false
 }

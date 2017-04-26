@@ -29,6 +29,19 @@ func TestMerge_Single(t *testing.T) {
 	}
 }
 
+func TestMerge_DuplicatedImports(t *testing.T) {
+	merger := CreateMerger()
+	singleFile := pfile.Pfile{Rows: []string{"Test"}, Imports: []pfile.Goimport{pfile.CreateGoimport("imp", "imp")}}
+	duplicatedFile := pfile.Pfile{Rows: []string{"TestDuplicated"}, Imports: []pfile.Goimport{pfile.CreateGoimport("imp", "imp")}}
+	mergefile := merger.Merge(&[]*pfile.Pfile{&singleFile, &duplicatedFile})
+	if len(mergefile.Rows) != 2 {
+		t.Errorf("Expected two rows but were <#%d: %s>.\n", len(mergefile.Rows), mergefile.Rows)
+	}
+	if len(mergefile.Imports) != 1 {
+		t.Errorf("Expected one import but was <%s>.\n", mergefile.Imports)	
+	}
+}
+
 func TestString(t *testing.T) {
 	mergefile := Mergefile{
 		Package: "main",
