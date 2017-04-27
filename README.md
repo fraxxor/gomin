@@ -6,8 +6,8 @@ The merged sourcecode is copied to clipboard.
 
 * Tested under Windows
 * Scans all files from Execution path (current dir of your cmd/shell)
- * only processes *.go-files which are not *_test.go-files
- * scans package names
+  * only processes *.go-files which are not *_test.go-files
+  * scans package names
 * Merges multiple self-written packages into one file, replacing import declarations if suitable
 
-Currently known (and excepted) bug: Using an import prefix which is hidden by a Variable name may cause unwanted replacements and merging will result into a non-compilable sourceode.
+Currently known (and accepted) bug: Using an import prefix which is hidden by a Variable name may cause unwanted replacements and merging will result into a non-compilable sourceode.
